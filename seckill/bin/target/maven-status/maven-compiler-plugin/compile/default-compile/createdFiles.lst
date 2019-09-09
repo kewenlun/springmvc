@@ -1,0 +1,9 @@
+bean\control\seckill.class
+datesource\tableserve\commodityuse.class
+bean\control\login.class
+datesource\dao\datesourcedao.class
+datesource\dao\tabledao.class
+datesource\tableserve\adminuse.class
+bean\stru\userstru.class
+datesource\source\coomdate.class
+bean\stru\commodityinf.class
