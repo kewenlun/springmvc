@@ -1,10 +1,11 @@
 package seckillserve.javaserve;
 
 
+
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import seckillserve.deal.Interf_url_deal;
 import seckillserve.deal.datedeal.response;
+import seckillserve.deal.deal;
 import seckillserve.javabean.HttpContext;
 import seckillserve.javabean.HttpResponse;
 import seckillserve.prestrain.dispose;
@@ -18,7 +19,7 @@ import java.util.concurrent.Executors;
 import static java.lang.Thread.sleep;
 
 //服务器运行函数
-public class runserve {
+public class run_web {
     private static final int PORT = 12345;
     private ArrayList<Socket> mList = new ArrayList<Socket>();
     private ServerSocket server = null;
@@ -81,15 +82,19 @@ public class runserve {
                 System.out.println("我在这打印一下接收到的报文");
                 System.out.println(requestText);
 
-                JSONObject datesource = new JSONObject();
                 HttpContext context = new HttpContext(requestText);
-
-                Interf_url_deal s = new Interf_url_deal(context.getRequest().getUrl(),context);
-                JSONArray datesour = s.deal();
-                System.out.println("在此处输出一下返回的信息");
-                System.out.println(datesour);
-                sendCookie(context);
-                send(datesour);
+                //对地址进行转发
+                deal s = new deal();
+                int x = s.urldeal(context.getRequest().getUrl(),context);
+                if (x == 1){
+                    JSONArray datesource = new JSONArray();
+                    datesource = context.getResponse().getResponseJSON();
+                    sendCookie(context);
+                    send(datesource);
+                }
+                else {
+                    sendhtml(context);
+                }
 
                 mList.remove(client);
                 client.close();
@@ -159,14 +164,48 @@ public class runserve {
             }
             else {
                 client.getOutputStream().
-                    write(("HTTP/1.1 200 OK\r\n" +  //响应头第一行
-                            "Content-Type: text/json; charset=UTF-8\r\n" +  //简单放一个头部信息
-                            "Set-Cookie: "+httpContext.getCookie().getName()+"="+httpContext.getCookie().getValues()+
-                            ";path=/;max-age="+httpContext.getCookie().getMaxage()+"\r\n" //这个空行是来分隔请求头与请求体的
-                            +"\r\n"
-                    ).getBytes());
+                        write(("HTTP/1.1 200 OK\r\n" +  //响应头第一行
+                                "Content-Type: text/json; charset=UTF-8\r\n" +  //简单放一个头部信息
+                                "Set-Cookie: "+httpContext.getCookie().getName()+"="+httpContext.getCookie().getValues()+
+                                ";path=/;max-age="+httpContext.getCookie().getMaxage()+"\r\n" //这个空行是来分隔请求头与请求体的
+                                +"\r\n"
+                        ).getBytes());
             }
 
         }
+
+        public void sendhtml(HttpContext context) throws IOException {
+            String datesource = context.getResponse().getResponseText();
+            String type = context.getRequest().getUrl();
+            int x = 0;
+            String[] l = type.replace(".","A").split("A");
+            if ((x = type.indexOf("js")) != -1){
+                System.out.println("我返回的是js格式");
+                client.getOutputStream().
+                        write(("HTTP/1.1 200 OK\r\n" +  //响应头第一行
+                                "Content-Type: text/javascript; charset=utf-8\r\n" +  //简单放一个头部信息
+                                "\r\n" +  //这个空行是来分隔请求头与请求体的
+                                datesource).getBytes());
+            }
+            else if ((x = type.indexOf("css")) != -1){
+                System.out.println("我返回的是css格式");
+                client.getOutputStream().
+                        write(("HTTP/1.1 200 OK\r\n" +  //响应头第一行
+                                "Content-Type: text/css; charset=utf-8\r\n" +  //简单放一个头部信息
+                                "\r\n" +  //这个空行是来分隔请求头与请求体的
+                                datesource).getBytes());
+            }
+            else {
+                System.out.println("我返回的是html格式");
+                client.getOutputStream().
+                        write(("HTTP/1.1 200 OK\r\n" +  //响应头第一行
+                                "Content-Type: text/html; charset=utf-8\r\n" +  //简单放一个头部信息
+                                "\r\n" +  //这个空行是来分隔请求头与请求体的
+                                datesource).getBytes());
+            }
+            client.close();
+        }
+
     }
 }
+

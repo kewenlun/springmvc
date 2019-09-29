@@ -1,8 +1,6 @@
 package seckillserve.javabean;
 
-import org.omg.IOP.Encoding;
-
-import java.io.UnsupportedEncodingException;
+import com.alibaba.fastjson.JSONArray;
 
 public class HttpResponse
 {
@@ -12,15 +10,25 @@ public class HttpResponse
     private String StateDescription;
     // 响应内容类型
     private String ContentType;
-    //响应报文的正文内容
-    private String respondText = null;
+    //响应内容
+    private String ResponseText;
 
-    public void setRespondText(String respondText){
-        this.respondText = respondText;
+    private JSONArray ResponseJSON;
+
+    public void setResponseText(String responseText) {
+        ResponseText = responseText;
     }
 
-    public String getRespondText(){
-        return respondText;
+    public void setResponseJSON(JSONArray responseJSON) {
+        ResponseJSON = responseJSON;
+    }
+
+    public String getResponseText() {
+        return ResponseText;
+    }
+
+    public JSONArray getResponseJSON() {
+        return ResponseJSON;
     }
 
     public void setStateCode(String stateCode) {

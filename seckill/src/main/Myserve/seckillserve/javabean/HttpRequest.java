@@ -10,20 +10,25 @@ public class HttpRequest
     // Http协议版本
     private String HttpVersion;
     // 请求头
-    public HttpRequest(String requestText)
-    {
+    public HttpRequest(String requestText) {
         String[] lines = requestText.replace("\n", "\r").split("\r");
         String[] requestLines = lines[0].split(" ");
         // 获取HTTP请求方式、请求的URL地址、HTTP协议版本
         HttpMethod = requestLines[0];
         System.out.println("我已经读到了HTTP请求方式"+HttpMethod);
-//        String[] ur = requestLines[1].split("?") ;
-        Url = requestLines[1];
+        int x = requestLines[1].indexOf("?");
+        if (x == -1){
+            //String[] a = requestLines[1].split("/api");
+            Url = requestLines[1];
+        }
+        else {
+            String[] a = requestLines[1].replace("?","ASDF").split("ASDF");
+            Url = a[0];
+        }
         System.out.println("我读到了请求地址"+Url);
         HttpVersion = requestLines[2];
         System.out.println("我读到了HTTP协议"+HttpVersion);
         System.out.println(lines.length);
-//        System.out.println("......"+lines[11]+".........");
     }
 
     public void setHttpMethod(String httpMethod) {
